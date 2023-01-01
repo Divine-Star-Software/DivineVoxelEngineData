@@ -1,0 +1,26 @@
+{
+  "sources": [
+    {
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/out",
+      "fileExtensions": [
+        "js",
+        "d.ts"
+      ],
+      "id": "main"
+    }
+  ],
+  "outputs": [
+    {
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/testing/out",
+      "sourceID": "main",
+      "codeSection": "All",
+      "keepComments": true
+    }
+  ],
+  "codeSections": {
+    "all": {
+      "start": "@ds-all-start",
+      "end": "@ds-all-end"
+    }
+  }
+}

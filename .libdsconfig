@@ -1,0 +1,38 @@
+{
+  "sources": [
+    {
+      "dir": "D:/DSSoftware/DSLIBS/voxelSpaces/src",
+      "fileExtensions": [
+        "ts"
+      ],
+      "id": "voxelSpaces"
+    },
+    {
+      "dir": "D:/DSSoftware/DSLIBS/divineBinaryTags/src",
+      "fileExtensions": [
+        "ts"
+      ],
+      "id": "dbt"
+    }
+  ],
+  "outputs": [
+    {
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Libs/voxelSpaces",
+      "sourceID": "voxelSpaces",
+      "codeSection": "all",
+      "keepComments": true
+    },
+    {
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Libs/divineBinaryTags",
+      "sourceID": "dbt",
+      "codeSection": "all",
+      "keepComments": true
+    }
+  ],
+  "codeSections": {
+    "test": {
+      "start": "@ds-test-start",
+      "end": "@ds-test-end"
+    }
+  }
+}
