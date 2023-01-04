@@ -17,13 +17,13 @@
   ],
   "outputs": [
     {
-      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Libs/voxelSpaces",
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Node/Libs/voxelSpaces",
       "sourceID": "voxelSpaces",
       "codeSection": "all",
       "keepComments": true
     },
     {
-      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Libs/divineBinaryTags",
+      "dir": "D:/DSSoftware/DSLIBS/divineVoxelEngineData/src/Node/Libs/divineBinaryTags",
       "sourceID": "dbt",
       "codeSection": "all",
       "keepComments": true

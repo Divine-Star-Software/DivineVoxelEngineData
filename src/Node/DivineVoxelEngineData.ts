@@ -1,16 +1,22 @@
-import { TagManager } from "../libs/divineBinaryTags/TagManager.js";
-import { VoxelSpaces } from "../libs/voxelSpaces/VoxelSpaces.js";
 import type * as FileSystem from "fs";
-import { DVEDSystem } from "./DVEDSystem.js";
 import { RegionTool } from "./Tools/RegionTool.js";
-import { RegionHeaderData, SecotrData } from "./Constants/DVED.constants.js";
-const spaces = VoxelSpaces.getVoxelSpaces();
-const regionTagManager = new TagManager("DVED-region");
+import { RegionData, RegionTagIds, SecotrData } from "./Util/DVED.util.js";
+import { VoxelSpaces } from "./Libs/voxelSpaces/VoxelSpaces.js";
+import { TagManager } from "./Libs/divineBinaryTags/TagManager.js";
+import { System } from "./System/System.js";
+import { SystemPath } from "./System/SystemPath.js";
+
 type Vector3 = { x: number; y: number; z: number };
 
+const voxelSpaces = VoxelSpaces.getVoxelSpaces();
+const regionTagManager = new TagManager("region-tagsx");
+
 export const DVED = {
-  spaces: spaces,
-  tags: regionTagManager,
+  spaces: voxelSpaces,
+  regionTags: regionTagManager,
+  system : System,
+  path : SystemPath,
+
   $INIT(data: {
     fs: typeof FileSystem;
     sectorSize: number;
@@ -20,23 +26,32 @@ export const DVED = {
       chunks: Vector3;
     };
   }) {
+    this.spaces = voxelSpaces;
     SecotrData.byteSize = data.sectorSize;
-    DVEDSystem.setFS(data.fs);
-    spaces.setDimensions(data.spaceBounds);
+    System.$INIT(data.fs);
+    this.spaces.setDimensions(data.spaceBounds);
+    const numberColumns = this.spaces.region.getColumnVolume();
     regionTagManager.registerTag({
-      id: "#dved-column-sector-index",
+      id: RegionTagIds.sectorIndex,
       type: "typed-number-array",
       numberType: "16ui",
-      length: spaces.region.getColumnVolume(),
+      length: numberColumns,
     });
     regionTagManager.registerTag({
-      id: "#dved-column-legnth-index",
+      id: RegionTagIds.columnLength,
       type: "typed-number-array",
       numberType: "16ui",
-      length: spaces.region.getColumnVolume(),
+      length: numberColumns,
+    });
+    regionTagManager.registerTag({
+      id: RegionTagIds.timeStamp,
+      type: "typed-number-array",
+      numberType: "32ui",
+      length: numberColumns,
     });
     regionTagManager.$INIT();
-    RegionHeaderData.byteSize = regionTagManager.tagSize;
+    RegionData.headByteSize = regionTagManager.tagSize;
+    RegionData.numColumns = numberColumns;
   },
 
   getRegionTool() {

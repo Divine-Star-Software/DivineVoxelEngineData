@@ -1,7 +1,7 @@
 {
-  "name": "divine-binary-tags",
+  "name": "dved",
   "version": "0.0.41",
-  "description": "A TypeScript library working with binary data.",
+  "description": "A TypeScript library working with DVE data.",
   "type": "module",
   "main": "out/index.js",
   "types": "out/index.d.ts",
