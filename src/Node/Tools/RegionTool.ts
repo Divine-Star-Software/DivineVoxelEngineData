@@ -3,6 +3,7 @@ import { DVED } from "../DivineVoxelEngineData.js";
 import { System } from "../System/System.js";
 import { RegionSystem } from "../System/RegionSystem.js";
 import { RegionData } from "../Util/DVED.util.js";
+import { SystemPath } from "../System/SystemPath.js";
 
 export class RegionTool {
   location: DVEDLocationData = ["main", 0, 0, 0];
@@ -11,11 +12,6 @@ export class RegionTool {
   path = "";
   fileName = "";
   dataType: DVEDDataTypes = "world-data";
-
-  setPath(path: string) {
-    this.path = path;
-    return this;
-  }
 
   setDataType(dataTypes: DVEDDataTypes) {
     this.dataType = dataTypes;
@@ -26,6 +22,7 @@ export class RegionTool {
   setLocation(location: DVEDLocationData) {
     this.location = location;
     this.dimension = location[0];
+    this.path = SystemPath.getDataDirectory();
     this._setFileName();
     if (location[0] != this.previousDimension) {
       System.mkdirs([
@@ -68,13 +65,16 @@ export class RegionTool {
   }
 
   regionExists() {
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (file) file.close();
     return Boolean(file);
   }
 
   createRegion() {
-    return System.createFile(this.getCurrentPath(), RegionData.headByteSize);
+    return System.sync.createFile(
+      this.getCurrentPath(),
+      RegionData.headByteSize
+    );
   }
 
   regionHasColumn() {
@@ -83,13 +83,13 @@ export class RegionTool {
   }
 
   getAllColumns() {
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (!file) return false;
     return RegionSystem._getAllColumns(file);
   }
 
   copyToNewfile() {
-    const swapFile = System.createAndOpenFile(
+    const swapFile = System.sync.createAndOpenFile(
       this._getSwapPath(),
       RegionData.headByteSize
     );
@@ -102,7 +102,7 @@ export class RegionTool {
   }
 
   getColumnTimestamp() {
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (!file) return false;
     const timeStamp = RegionSystem.timeStamp.get(
       file,
@@ -112,11 +112,33 @@ export class RegionTool {
     return !timeStamp ? 0 : timeStamp;
   }
 
+  getSectorIndex() {
+    const file = System.sync.openFile(this.getCurrentPath());
+    if (!file) return false;
+    const index = RegionSystem.sectorIndex.get(
+      file,
+      RegionSystem._getIndex(this.location)
+    );
+    file.close();
+    return !index ? 0 : index;
+  }
+
+  getColumnDataLength() {
+    const file = System.sync.openFile(this.getCurrentPath());
+    if (!file) return false;
+    const length = RegionSystem.columnLength.get(
+      file,
+      RegionSystem._getIndex(this.location)
+    );
+    file.close();
+    return !length ? 0 : length;
+  }
+
   getHeader() {
     if (!this.regionExists()) {
       this.createRegion();
     }
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (!file) return false;
     const buffer = RegionSystem.getHeader(file);
     file.close();
@@ -124,7 +146,7 @@ export class RegionTool {
   }
 
   loadColumn() {
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (!file) return false;
     const data = RegionSystem.loadColumn(file, this.location);
     file.close();
@@ -135,7 +157,7 @@ export class RegionTool {
     if (!this.regionExists()) {
       this.createRegion();
     }
-    const file = System.openFile(this.getCurrentPath());
+    const file = System.sync.openFile(this.getCurrentPath());
     if (!file) return false;
     RegionSystem.saveColumn(file, this.location, buffer);
     file.close();

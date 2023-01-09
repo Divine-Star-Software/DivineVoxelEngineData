@@ -12,8 +12,11 @@ export const DVED = {
     system: System,
     path: SystemPath,
     $INIT(data) {
+        SystemPath.setFolder(data.dataDirecotry);
+        console.log(SystemPath.getDataPath());
         this.spaces = voxelSpaces;
         SecotrData.byteSize = data.sectorSize;
+        SystemPath._dataFolder = data.dataDirecotry;
         System.$INIT(data.fs);
         this.spaces.setDimensions(data.spaceBounds);
         const numberColumns = this.spaces.region.getColumnVolume();

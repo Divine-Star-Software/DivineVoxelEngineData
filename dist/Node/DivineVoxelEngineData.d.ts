@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type * as FileSystem from "fs";
 import { RegionTool } from "./Tools/RegionTool.js";
 import { TagManager } from "./Libs/divineBinaryTags/TagManager.js";
@@ -33,11 +34,35 @@ export declare const DVED: {
                 x: number;
                 y: number;
                 z: number;
+                copy(): any;
+                copyTo(vec3: {
+                    x: number;
+                    y: number;
+                    z: number;
+                }): void;
+                toString(): string;
+                multiply(vec3: {
+                    x: number;
+                    y: number;
+                    z: number;
+                }): any;
             };
             getRegionPositonxXYZ(x: number, y: number, z: number): {
                 x: number;
                 y: number;
                 z: number;
+                copy(): any;
+                copyTo(vec3: {
+                    x: number;
+                    y: number;
+                    z: number;
+                }): void;
+                toString(): string;
+                multiply(vec3: {
+                    x: number;
+                    y: number;
+                    z: number;
+                }): any;
             };
             getRegionIndex(): number;
             getRegionIndexXYZ(x: number, y: number, z: number): number;
@@ -65,19 +90,29 @@ export declare const DVED: {
     system: {
         fs: typeof FileSystem;
         $INIT(fs: typeof FileSystem): void;
+        updateFolder(folder: string): void;
         mkdirs(paths: string[]): void;
-        createFile(path: string, size?: number, mode?: number): boolean;
-        createAndOpenFile(path: string, size?: number): false | import("../Types/DVED.types.js").DVEDFile;
-        openFile(filePath: string, showErrors?: boolean): false | import("../Types/DVED.types.js").DVEDFile;
+        sync: {
+            createFile(path: string, size?: number, mode?: number): boolean;
+            createAndOpenFile(path: string, size?: number): false | import("../Types/DVED.types.js").DVEDSyncFile;
+            openFile(filePath: string, showErrors?: boolean): false | import("../Types/DVED.types.js").DVEDSyncFile;
+        };
     };
     path: {
         _dataPath: string;
         _dataFolder: string;
-        getDataPath(fileName: string): string;
+        _folder: string;
+        _tempPath: string;
+        setFolder(folder: string): void;
+        getDataPath(): string;
+        getDataDirectory(fileName?: string): string;
+        getDirecoty(fileName?: string): string;
+        getTempPath(fileName?: string): string;
         $INIT(): void;
     };
     $INIT(data: {
         fs: typeof FileSystem;
+        dataDirecotry: string;
         sectorSize: number;
         spaceBounds: {
             regions: Vector3;

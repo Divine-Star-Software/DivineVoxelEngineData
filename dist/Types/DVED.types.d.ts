@@ -5,7 +5,7 @@ export declare type DVEDLocationData = [
     z: number
 ];
 export declare type DVEDDataTypes = "world-data" | "rich-data" | "entities" | "dbo";
-export declare type DVEDFile = {
+export declare type DVEDSyncFile = {
     getSize(): number;
     clear(byteStart: number, byteLength: number): boolean;
     write(byteStart: number, data: ArrayBuffer): boolean;

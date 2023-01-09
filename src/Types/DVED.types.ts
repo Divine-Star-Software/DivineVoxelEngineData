@@ -6,7 +6,7 @@ export type DVEDLocationData = [
 ];
 export type DVEDDataTypes = "world-data" | "rich-data" | "entities" | "dbo";
 
-export type DVEDFile = {
+export type DVEDSyncFile = {
   getSize(): number;
   clear(byteStart: number, byteLength: number): boolean;
   write(byteStart: number, data: ArrayBuffer): boolean;

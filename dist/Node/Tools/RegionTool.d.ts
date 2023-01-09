@@ -6,7 +6,6 @@ export declare class RegionTool {
     path: string;
     fileName: string;
     dataType: DVEDDataTypes;
-    setPath(path: string): this;
     setDataType(dataTypes: DVEDDataTypes): this;
     setLocation(location: DVEDLocationData): this;
     getCurrentPath(): string;
@@ -20,6 +19,8 @@ export declare class RegionTool {
     getAllColumns(): false | IterableIterator<[number, ArrayBuffer]>;
     copyToNewfile(): void;
     getColumnTimestamp(): number | false;
+    getSectorIndex(): number | false;
+    getColumnDataLength(): number | false;
     getHeader(): false | ArrayBuffer;
     loadColumn(): false | ArrayBuffer;
     saveColumn(buffer: ArrayBuffer | string): boolean;

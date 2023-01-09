@@ -14,11 +14,12 @@ const regionTagManager = new TagManager("region-tagsx");
 export const DVED = {
   spaces: voxelSpaces,
   regionTags: regionTagManager,
-  system : System,
-  path : SystemPath,
+  system: System,
+  path: SystemPath,
 
   $INIT(data: {
     fs: typeof FileSystem;
+    dataDirecotry: string;
     sectorSize: number;
     spaceBounds: {
       regions: Vector3;
@@ -26,8 +27,11 @@ export const DVED = {
       chunks: Vector3;
     };
   }) {
+    SystemPath.setFolder(data.dataDirecotry);
+    console.log(SystemPath.getDataPath());
     this.spaces = voxelSpaces;
     SecotrData.byteSize = data.sectorSize;
+    SystemPath._dataFolder = data.dataDirecotry;
     System.$INIT(data.fs);
     this.spaces.setDimensions(data.spaceBounds);
     const numberColumns = this.spaces.region.getColumnVolume();

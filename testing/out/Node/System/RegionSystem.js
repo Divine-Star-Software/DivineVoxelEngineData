@@ -33,7 +33,7 @@ export const RegionSystem = {
             return new Uint32Array(timeStampData)[0];
         },
         set(file, index, timeStamp = Date.now()) {
-            file.write(RegionSystem._getTagIndex(RegionTagIds.timeStamp, index), new Uint32Array([timeStamp]).buffer);
+            return file.write(RegionSystem._getTagIndex(RegionTagIds.timeStamp, index), new Uint32Array([timeStamp]).buffer);
         },
     },
     sectorIndex: {
@@ -41,10 +41,10 @@ export const RegionSystem = {
             const sectorIndexData = file.read(RegionSystem._getTagIndex(RegionTagIds.sectorIndex, index), 2);
             if (!sectorIndexData)
                 return false;
-            return new Uint16Array(sectorIndexData)[0];
+            return new Uint16Array(sectorIndexData)[0] + 1;
         },
-        set(file, index, length) {
-            file.write(RegionSystem._getTagIndex(RegionTagIds.sectorIndex, index), new Uint16Array([length]).buffer);
+        set(file, index, sectorIndex) {
+            return file.write(RegionSystem._getTagIndex(RegionTagIds.sectorIndex, index), new Uint16Array([sectorIndex - 1]).buffer);
         },
     },
     columnLength: {
@@ -60,12 +60,12 @@ export const RegionSystem = {
     },
     sectors: {
         get(file, sectorIndex, length) {
-            return file.read(SecotrData.getSectorByteIndex(sectorIndex), length);
+            return file.read(SecotrData.getSectorByteIndex(sectorIndex - 1), length);
         },
         set(file, sectorIndex, data) {
-            const sectorByteIndex = SecotrData.getSectorByteIndex(sectorIndex);
+            const sectorByteIndex = SecotrData.getSectorByteIndex(sectorIndex - 1);
             file.clear(sectorByteIndex, SecotrData.getTotalBytesNeeded(data.byteLength));
-            file.write(sectorByteIndex, data);
+            return file.write(sectorByteIndex, data);
         },
     },
     getHeader(file) {
@@ -75,6 +75,8 @@ export const RegionSystem = {
         const columns = this._getAllColumns(file);
         for (const column of columns) {
             let [index, data] = column;
+            if (data.byteLength == 0)
+                continue;
             if (index == newColumnIndex)
                 data = newColumnData;
             this.saveColumn(swapFile, index, data);
@@ -92,39 +94,43 @@ export const RegionSystem = {
     loadColumn(file, index) {
         index = this._getIndex(index);
         const sectorIndex = this.sectorIndex.get(file, index);
-        if (!sectorIndex)
+        if (typeof sectorIndex == "boolean")
             return false;
         const columnLength = this.columnLength.get(file, index);
-        if (!columnLength)
+        if (typeof columnLength == "boolean" || columnLength === 0)
             return false;
         return this.sectors.get(file, sectorIndex, columnLength);
     },
     saveColumn(file, index, data) {
         index = this._getIndex(index);
         data = this._processInput(data);
-        const currentFileSize = file.getSize();
+        let timeStamp = this.timeStamp.get(file, index);
         let sectorIndex = this.sectorIndex.get(file, index);
-        if (!sectorIndex) {
-            sectorIndex = SecotrData.getTotalSectorsInFile(currentFileSize);
+        if (!sectorIndex)
+            throw new Error("error");
+        if (!timeStamp) {
+            const currentFileSize = file.getSize();
+            sectorIndex = SecotrData.getTotalSectorsInFile(currentFileSize) + 1;
             this.sectorIndex.set(file, index, sectorIndex);
         }
         let currentColumnLegnth = this.columnLength.get(file, index);
         if (currentColumnLegnth) {
             const currentSectors = SecotrData.getSectorsNeeded(currentColumnLegnth);
             const newSectors = SecotrData.getSectorsNeeded(data.byteLength);
-            if (currentSectors < newSectors) {
-                const swapFilePath = SystemPath.getDataPath(Date.now() + "-temp.dved");
-                const swapFile = System.createAndOpenFile(swapFilePath, RegionData.headByteSize);
+            if (currentSectors != newSectors) {
+                const swapFilePath = SystemPath.getDirecoty(file.getPath()) +
+                    "/" +
+                    Date.now() +
+                    "-temp.dved";
+                const oldPath = file.getPath();
+                file.move(swapFilePath);
+                //  file.reOpen();
+                const swapFile = System.sync.createAndOpenFile(oldPath, RegionData.headByteSize);
                 if (swapFile) {
                     this._rebuild(file, swapFile, index, data);
-                    swapFile.move(file.getPath());
+                    file.delete();
                     swapFile.close();
-                    file.reOpen();
-                    const deleteSwap = System.openFile(swapFilePath);
-                    if (deleteSwap) {
-                        deleteSwap.delete();
-                        deleteSwap.close();
-                    }
+                    return;
                 }
             }
         }

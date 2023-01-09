@@ -1,4 +1,4 @@
-import type { DVEDFile, DVEDLocationData } from "Types/DVED.types";
+import type { DVEDSyncFile, DVEDLocationData } from "../../Types/DVED.types";
 import { RegionData, RegionTagIds, SecotrData } from "../Util/DVED.util.js";
 import { DVED } from "../DivineVoxelEngineData.js";
 import { System } from "./System.js";
@@ -29,7 +29,7 @@ export const RegionSystem = {
   },
 
   timeStamp: {
-    get(file: DVEDFile, index: number) {
+    get(file: DVEDSyncFile, index: number) {
       const timeStampData = file.read(
         RegionSystem._getTagIndex(RegionTagIds.timeStamp, index),
         4
@@ -37,31 +37,31 @@ export const RegionSystem = {
       if (!timeStampData) return false;
       return new Uint32Array(timeStampData)[0];
     },
-    set(file: DVEDFile, index: number, timeStamp = Date.now()) {
-      file.write(
+    set(file: DVEDSyncFile, index: number, timeStamp = Date.now()) {
+      return file.write(
         RegionSystem._getTagIndex(RegionTagIds.timeStamp, index),
         new Uint32Array([timeStamp]).buffer
       );
     },
   },
   sectorIndex: {
-    get(file: DVEDFile, index: number) {
+    get(file: DVEDSyncFile, index: number) {
       const sectorIndexData = file.read(
         RegionSystem._getTagIndex(RegionTagIds.sectorIndex, index),
         2
       );
       if (!sectorIndexData) return false;
-      return new Uint16Array(sectorIndexData)[0];
+      return new Uint16Array(sectorIndexData)[0] + 1;
     },
-    set(file: DVEDFile, index: number, length: number) {
-      file.write(
+    set(file: DVEDSyncFile, index: number, sectorIndex: number) {
+      return file.write(
         RegionSystem._getTagIndex(RegionTagIds.sectorIndex, index),
-        new Uint16Array([length]).buffer
+        new Uint16Array([sectorIndex - 1]).buffer
       );
     },
   },
   columnLength: {
-    get(file: DVEDFile, index: number) {
+    get(file: DVEDSyncFile, index: number) {
       const columnLengthData = file.read(
         RegionSystem._getTagIndex(RegionTagIds.columnLength, index),
         2
@@ -69,7 +69,7 @@ export const RegionSystem = {
       if (!columnLengthData) return false;
       return new Uint16Array(columnLengthData)[0];
     },
-    set(file: DVEDFile, index: number, length: number) {
+    set(file: DVEDSyncFile, index: number, length: number) {
       return file.write(
         RegionSystem._getTagIndex(RegionTagIds.columnLength, index),
         new Uint16Array([length]).buffer
@@ -77,38 +77,39 @@ export const RegionSystem = {
     },
   },
   sectors: {
-    get(file: DVEDFile, sectorIndex: number, length: number) {
-      return file.read(SecotrData.getSectorByteIndex(sectorIndex), length);
+    get(file: DVEDSyncFile, sectorIndex: number, length: number) {
+      return file.read(SecotrData.getSectorByteIndex(sectorIndex - 1), length);
     },
-    set(file: DVEDFile, sectorIndex: number, data: ArrayBuffer) {
-      const sectorByteIndex = SecotrData.getSectorByteIndex(sectorIndex);
+    set(file: DVEDSyncFile, sectorIndex: number, data: ArrayBuffer) {
+      const sectorByteIndex = SecotrData.getSectorByteIndex(sectorIndex - 1);
       file.clear(
         sectorByteIndex,
         SecotrData.getTotalBytesNeeded(data.byteLength)
       );
-      file.write(sectorByteIndex, data);
+      return file.write(sectorByteIndex, data);
     },
   },
 
-  getHeader(file: DVEDFile) {
+  getHeader(file: DVEDSyncFile) {
     return file.read(0, RegionData.headByteSize);
   },
 
   _rebuild(
-    file: DVEDFile,
-    swapFile: DVEDFile,
+    file: DVEDSyncFile,
+    swapFile: DVEDSyncFile,
     newColumnIndex: number,
     newColumnData: ArrayBuffer
   ) {
     const columns = this._getAllColumns(file);
     for (const column of columns) {
       let [index, data] = column;
+      if (data.byteLength == 0) continue;
       if (index == newColumnIndex) data = newColumnData;
       this.saveColumn(swapFile, index, data);
     }
   },
 
-  _getAllColumns(file: DVEDFile) {
+  _getAllColumns(file: DVEDSyncFile) {
     return (function* generator(): IterableIterator<[number, ArrayBuffer]> {
       for (let i = 0; i < RegionData.numColumns; i++) {
         let data = RegionSystem.loadColumn(file, i);
@@ -118,49 +119,53 @@ export const RegionSystem = {
     })();
   },
 
-  loadColumn(file: DVEDFile, index: number | DVEDLocationData) {
+  loadColumn(file: DVEDSyncFile, index: number | DVEDLocationData) {
     index = this._getIndex(index);
     const sectorIndex = this.sectorIndex.get(file, index);
-    if (!sectorIndex) return false;
+    if (typeof sectorIndex == "boolean") return false;
     const columnLength = this.columnLength.get(file, index);
-    if (!columnLength) return false;
+    if (typeof columnLength == "boolean" || columnLength === 0) return false;
     return this.sectors.get(file, sectorIndex, columnLength);
   },
 
   saveColumn(
-    file: DVEDFile,
+    file: DVEDSyncFile,
     index: number | DVEDLocationData,
     data: ArrayBuffer | string
   ) {
     index = this._getIndex(index);
     data = this._processInput(data);
-    const currentFileSize = file.getSize();
+    let timeStamp = this.timeStamp.get(file, index);
     let sectorIndex = this.sectorIndex.get(file, index);
-    if (!sectorIndex) {
-      sectorIndex = SecotrData.getTotalSectorsInFile(currentFileSize);
+    if (!sectorIndex) throw new Error("error");
+    if (!timeStamp) {
+      const currentFileSize = file.getSize();
+      sectorIndex = SecotrData.getTotalSectorsInFile(currentFileSize) + 1;
       this.sectorIndex.set(file, index, sectorIndex);
     }
     let currentColumnLegnth = this.columnLength.get(file, index);
     if (currentColumnLegnth) {
       const currentSectors = SecotrData.getSectorsNeeded(currentColumnLegnth);
       const newSectors = SecotrData.getSectorsNeeded(data.byteLength);
-      if (currentSectors < newSectors) {
-        const swapFilePath = SystemPath.getDataPath(Date.now() + "-temp.dved");
-        const swapFile = System.createAndOpenFile(
-          swapFilePath,
+      if (currentSectors != newSectors) {
+        const swapFilePath =
+          SystemPath.getDirecoty(file.getPath()) +
+          "/" +
+          Date.now() +
+          "-temp.dved";
+        const oldPath = file.getPath();
+        file.move(swapFilePath);
+        //  file.reOpen();
+        const swapFile = System.sync.createAndOpenFile(
+          oldPath,
           RegionData.headByteSize
         );
 
         if (swapFile) {
           this._rebuild(file, swapFile, index, data);
-          swapFile.move(file.getPath());
+          file.delete();
           swapFile.close();
-          file.reOpen();
-          const deleteSwap = System.openFile(swapFilePath);
-          if (deleteSwap) {
-            deleteSwap.delete();
-            deleteSwap.close();
-          }
+          return;
         }
       }
     }
