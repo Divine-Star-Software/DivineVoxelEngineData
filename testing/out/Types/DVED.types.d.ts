@@ -1,9 +1,3 @@
-export declare type DVEDLocationData = [
-    dimension: string,
-    x: number,
-    y: number,
-    z: number
-];
 export declare type DVEDDataTypes = "world-data" | "rich-data" | "entities" | "dbo";
 export declare type DVEDSyncFile = {
     getSize(): number;

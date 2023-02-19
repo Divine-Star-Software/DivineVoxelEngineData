@@ -16,5 +16,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^18.11.18"
+  },
+  "dependencies": {
+    "divine-binary-tags": "^0.0.5",
+    "voxelspaces": "^1.0.1",
+    "zeneithdb": "^0.0.21"
   }
 }

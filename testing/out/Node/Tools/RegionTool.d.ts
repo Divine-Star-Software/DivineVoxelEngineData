@@ -1,13 +1,14 @@
-import type { DVEDDataTypes, DVEDLocationData } from "../../Types/DVED.types";
-export declare class RegionTool {
-    location: DVEDLocationData;
+import type { DVEDDataTypes } from "../../Types/DVED.types";
+import type { LocationData } from "../Libs/voxelSpaces/Types/VoxelSpaces.types";
+export declare class NodeRegionTool {
+    location: LocationData;
     dimension: string;
     previousDimension: string;
     path: string;
     fileName: string;
     dataType: DVEDDataTypes;
     setDataType(dataTypes: DVEDDataTypes): this;
-    setLocation(location: DVEDLocationData): this;
+    setLocation(location: LocationData): this;
     getCurrentPath(): string;
     _getSwapPath(): string;
     _dimensionPath(dataPath?: string): string;

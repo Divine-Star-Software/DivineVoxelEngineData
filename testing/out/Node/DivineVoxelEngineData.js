@@ -1,7 +1,7 @@
-import { RegionTool } from "./Tools/RegionTool.js";
+import { NodeRegionTool } from "./Tools/NodeRegionTool.js";
 import { RegionData, RegionTagIds, SecotrData } from "./Util/DVED.util.js";
-import { VoxelSpaces } from "./Libs/voxelSpaces/VoxelSpaces.js";
-import { TagManager } from "./Libs/divineBinaryTags/TagManager.js";
+import { VoxelSpaces } from "voxelspaces";
+import { TagManager } from "divine-binary-tags";
 import { System } from "./System/System.js";
 import { SystemPath } from "./System/SystemPath.js";
 const voxelSpaces = VoxelSpaces.getVoxelSpaces();
@@ -13,7 +13,6 @@ export const DVED = {
     path: SystemPath,
     $INIT(data) {
         SystemPath.setFolder(data.dataDirecotry);
-        console.log(SystemPath.getDataPath());
         this.spaces = voxelSpaces;
         SecotrData.byteSize = data.sectorSize;
         SystemPath._dataFolder = data.dataDirecotry;
@@ -43,6 +42,6 @@ export const DVED = {
         RegionData.numColumns = numberColumns;
     },
     getRegionTool() {
-        return new RegionTool();
+        return new NodeRegionTool();
     },
 };

@@ -1,8 +1,8 @@
 import type * as FileSystem from "fs";
-import { RegionTool } from "./Tools/RegionTool.js";
+import { NodeRegionTool } from "./Tools/NodeRegionTool.js";
 import { RegionData, RegionTagIds, SecotrData } from "./Util/DVED.util.js";
-import { VoxelSpaces } from "./Libs/voxelSpaces/VoxelSpaces.js";
-import { TagManager } from "./Libs/divineBinaryTags/TagManager.js";
+import { VoxelSpaces } from "voxelspaces";
+import { TagManager } from  "divine-binary-tags";
 import { System } from "./System/System.js";
 import { SystemPath } from "./System/SystemPath.js";
 
@@ -28,7 +28,6 @@ export const DVED = {
     };
   }) {
     SystemPath.setFolder(data.dataDirecotry);
-    console.log(SystemPath.getDataPath());
     this.spaces = voxelSpaces;
     SecotrData.byteSize = data.sectorSize;
     SystemPath._dataFolder = data.dataDirecotry;
@@ -59,6 +58,6 @@ export const DVED = {
   },
 
   getRegionTool() {
-    return new RegionTool();
+    return new NodeRegionTool();
   },
 };

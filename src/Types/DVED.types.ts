@@ -1,9 +1,3 @@
-export type DVEDLocationData = [
-  dimension: string,
-  x: number,
-  y: number,
-  z: number
-];
 export type DVEDDataTypes = "world-data" | "rich-data" | "entities" | "dbo";
 
 export type DVEDSyncFile = {
@@ -18,3 +12,6 @@ export type DVEDSyncFile = {
   getPath(): string;
   delete(): boolean;
 };
+
+
+console.log("what the fuck")

@@ -1,4 +1,6 @@
-import type { DVEDSyncFile, DVEDLocationData } from "../../Types/DVED.types";
+import type { DVEDSyncFile, } from "../../Types/DVED.types";
+import type { LocationData } from "voxelspaces";
+
 import { RegionData, RegionTagIds, SecotrData } from "../Util/DVED.util.js";
 import { DVED } from "../DivineVoxelEngineData.js";
 import { System } from "./System.js";
@@ -21,7 +23,7 @@ export const RegionSystem = {
     return DVED.regionTags.getArrayTagByteIndex(id, index);
   },
 
-  _getIndex(index: number | DVEDLocationData) {
+  _getIndex(index: number | LocationData) {
     if (Array.isArray(index)) {
       index = DVED.spaces.column.getIndexXYZ(index[1], index[2], index[3]);
     }
@@ -119,7 +121,7 @@ export const RegionSystem = {
     })();
   },
 
-  loadColumn(file: DVEDSyncFile, index: number | DVEDLocationData) {
+  loadColumn(file: DVEDSyncFile, index: number | LocationData) {
     index = this._getIndex(index);
     const sectorIndex = this.sectorIndex.get(file, index);
     if (typeof sectorIndex == "boolean") return false;
@@ -130,7 +132,7 @@ export const RegionSystem = {
 
   saveColumn(
     file: DVEDSyncFile,
-    index: number | DVEDLocationData,
+    index: number | LocationData,
     data: ArrayBuffer | string
   ) {
     index = this._getIndex(index);

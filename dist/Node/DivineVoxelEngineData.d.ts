@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import type * as FileSystem from "fs";
-import { RegionTool } from "./Tools/RegionTool.js";
-import { TagManager } from "./Libs/divineBinaryTags/TagManager.js";
+import { NodeRegionTool } from "./Tools/NodeRegionTool.js";
+import { TagManager } from "divine-binary-tags";
 declare type Vector3 = {
     x: number;
     y: number;
@@ -9,7 +9,7 @@ declare type Vector3 = {
 };
 export declare const DVED: {
     spaces: {
-        region: import("./Libs/voxelSpaces/Classes/VoxelSpace.js").VoxelSpace & {
+        region: import("voxelspaces/Classes/VoxelSpace.js").VoxelSpace & {
             chunkBounds: {
                 x: number;
                 y: number;
@@ -23,8 +23,8 @@ export declare const DVED: {
             getChunkVolume(): number;
             getColumnVolume(): number;
         };
-        column: import("./Libs/voxelSpaces/Classes/VoxelSpace.js").VoxelSpace;
-        chunk: import("./Libs/voxelSpaces/Classes/VoxelSpace.js").VoxelSpace & {
+        column: import("voxelspaces/Classes/VoxelSpace.js").VoxelSpace;
+        chunk: import("voxelspaces/Classes/VoxelSpace.js").VoxelSpace & {
             _regionPosition: {
                 x: number;
                 y: number;
@@ -67,7 +67,7 @@ export declare const DVED: {
             getRegionIndex(): number;
             getRegionIndexXYZ(x: number, y: number, z: number): number;
         };
-        voxel: import("./Libs/voxelSpaces/Classes/VoxelSpace.js").VoxelSpace;
+        voxel: import("voxelspaces/Classes/VoxelSpace.js").VoxelSpace;
         setDimensions(data: {
             regions: {
                 x: number;
@@ -120,6 +120,6 @@ export declare const DVED: {
             chunks: Vector3;
         };
     }): void;
-    getRegionTool(): RegionTool;
+    getRegionTool(): NodeRegionTool;
 };
 export {};
