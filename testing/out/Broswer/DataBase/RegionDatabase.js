@@ -1,11 +1,13 @@
-export const RegionDataBase = {
+export const WorldDataBase = {
     database: {},
+    create() {
+    },
     regionHeader: {
         async set(key, type, data) {
-            await RegionDataBase.database.setData(type, this._getKey(key, type), new Blob([data]));
+            await WorldDataBase.database.setData(type, this._getKey(key, type), new Blob([data]));
         },
         async get(key, type) {
-            const blob = await RegionDataBase.database.getData(type, this._getKey(key, type));
+            const blob = await WorldDataBase.database.getData(type, this._getKey(key, type));
             if (!blob)
                 return false;
             return await blob.arrayBuffer();
@@ -16,10 +18,10 @@ export const RegionDataBase = {
     },
     column: {
         async set(key, type, data) {
-            await RegionDataBase.database.setData(type, this._getKey(key, type), new Blob([data]));
+            await WorldDataBase.database.setData(type, this._getKey(key, type), new Blob([data]));
         },
         async get(key, type) {
-            const blob = await RegionDataBase.database.getData(type, this._getKey(key, type));
+            const blob = await WorldDataBase.database.getData(type, this._getKey(key, type));
             if (!blob)
                 return false;
             return await blob.arrayBuffer();
@@ -30,10 +32,10 @@ export const RegionDataBase = {
     },
     columnTimestamp: {
         async set(key, type, timeStamp) {
-            await RegionDataBase.database.setData(type, this._getKey(key, type), timeStamp);
+            await WorldDataBase.database.setData(type, this._getKey(key, type), timeStamp);
         },
         async get(key, type) {
-            const timeStamp = await RegionDataBase.database.getData(type, this._getKey(key, type));
+            const timeStamp = await WorldDataBase.database.getData(type, this._getKey(key, type));
             if (!timeStamp)
                 return false;
             return Number(timeStamp);

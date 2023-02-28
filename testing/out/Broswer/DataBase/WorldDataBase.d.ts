@@ -1,8 +1,10 @@
-import type { DataBase } from "zeneithdb";
+import type { DataBase, ObjectStore } from "zeneithdb";
 import type { DVEDDataTypes } from "../../Types/DVED.types";
 export declare const WorldDataBase: {
     database: DataBase;
-    create(): void;
+    dimension: string;
+    typeStores: Record<DVEDDataTypes, ObjectStore<any>>;
+    setDimension(id: string): Promise<void>;
     regionHeader: {
         set(key: string, type: DVEDDataTypes, data: ArrayBuffer): Promise<void>;
         get(key: string, type: DVEDDataTypes): Promise<ArrayBuffer | false>;

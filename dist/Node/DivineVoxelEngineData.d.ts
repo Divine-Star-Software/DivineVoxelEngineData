@@ -94,8 +94,8 @@ export declare const DVED: {
         mkdirs(paths: string[]): void;
         sync: {
             createFile(path: string, size?: number, mode?: number): boolean;
-            createAndOpenFile(path: string, size?: number): false | import("../Types/DVED.types.js").DVEDSyncFile;
-            openFile(filePath: string, showErrors?: boolean): false | import("../Types/DVED.types.js").DVEDSyncFile;
+            createAndOpenFile(path: string, size?: number): false | import("../index.js").DVEDSyncFile;
+            openFile(filePath: string, showErrors?: boolean): false | import("../index.js").DVEDSyncFile;
         };
     };
     path: {

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type * as FileSystem from "fs";
 import type { DVEDSyncFile } from "../../Types/DVED.types";
 export declare const System: {
